@@ -15,7 +15,7 @@
         header {
             background: #007BFF;
             color: white;
-            padding: 1.5em 0;
+            padding: 1em 0;
         }
         section {
             margin: 20px auto;
@@ -60,6 +60,18 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+        #welcomeMessage {
+            padding: 20px;
+            color: #007BFF;
+        }
+        #tatImage{
+            margin-bottom: 0;
+        }
+
+        h1{
+            margin: 0;
+            font-size: 1.5em;
+        }
     </style>
 </head>
 <body>
@@ -72,23 +84,18 @@
         <input type="number" id="totalTime" placeholder="4" value="4"><br>
         <button onclick="startTAT()">Start TAT</button>
         <div class="timer" id="tatTimer">Time Left: --:--</div>
-        <img id="tatImage" src="images/" alt="TAT Image">
+        <img id="tatImage" src="images/" alt="Image" style="display: none;">
+        <h1 id="welcomeMessage">Welcome to the Thematic Apperception Test (TAT)</h1>
     </section>
     <script>
-        // Array of image paths
-        const tatImages = [
-            "images/1.jpg",
-            "images/2.jpg",
-            "images/3.jpg",
-            "images/4.jpg",
-            "images/5.jpg",
-            "images/6.jpg",
-            "images/7.jpg",
-            "images/8.jpg",
-            "images/9.jpg",
-            "images/10.jpg",
-            "images/11.jpg"
-        ];
+        // Generate a dynamic array of 450+ image paths
+        const tatImages = [];
+        for (let i = 1; i <= 467; i++) {
+            // const imagePath = `images/TAT_pages-to-jpg-${i}.jpg`;
+            const imagePath = `images/TAT_pages-to-jpg-${String(i).padStart(4, '0')}.jpg`;
+            // console.log(imagePath); // Log the image path to the console
+            tatImages.push(imagePath);
+        }
 
         let currentImageIndex = 0; // To track the current image
         let timerInterval; // To store the interval for the timer
@@ -107,11 +114,27 @@
                 return;
             }
 
+            // Hide the welcome message and show the image if images are available
+            if (tatImages.length > 0) {
+                welcomeMessage.style.display = "none";
+                tatImage.style.display = "block";
+                tatImage.src = tatImages[currentImageIndex];
+            } else {
+                welcomeMessage.style.display = "block";
+                tatImage.style.display = "none";
+            }
+
+            // Shuffle the images array to randomize
+            const shuffledImages = tatImages.sort(() => Math.random() - 0.5);
+
+            // Select 11 random images for this session
+            const sessionImages = shuffledImages.slice(0, 11);
+
             currentImageIndex = 0; // Start with the first image
-            tatImage.src = tatImages[currentImageIndex]; // Display the first image
+            tatImage.src = sessionImages[currentImageIndex]; // Display the first image
 
             // Calculate the interval for each image change
-            const timePerImage = Math.floor(totalTime / tatImages.length);
+            const timePerImage = Math.floor(totalTime / sessionImages.length);
 
             // Start the timer
             startTimer(totalTime, tatTimer);
@@ -119,8 +142,8 @@
             // Change the image at regular intervals
             changeImageInterval = setInterval(() => {
                 currentImageIndex++;
-                if (currentImageIndex < tatImages.length) {
-                    tatImage.src = tatImages[currentImageIndex];
+                if (currentImageIndex < sessionImages.length) {
+                    tatImage.src = sessionImages[currentImageIndex];
                 } else {
                     clearInterval(changeImageInterval); // Stop changing images after the last one
                 }
