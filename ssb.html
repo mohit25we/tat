@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thematic Apperception Test (TAT)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f3f4f6;
+            text-align: center;
+        }
+        header {
+            background: #007BFF;
+            color: white;
+            padding: 1.5em 0;
+        }
+        section {
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100px;
+            text-align: center;
+        }
+        .timer {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #d9534f;
+            margin-top: 10px;
+        }
+        img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Thematic Apperception Test (TAT)</h1>
+    </header>
+    <section>
+        <p>Set the time for the test and analyze the given image.</p>
+        <label for="totalTime">Total Time (minutes): </label>
+        <input type="number" id="totalTime" placeholder="4" value="4"><br>
+        <button onclick="startTAT()">Start TAT</button>
+        <div class="timer" id="tatTimer">Time Left: --:--</div>
+        <img id="tatImage" src="images/" alt="TAT Image">
+    </section>
+    <script>
+        // Array of image paths
+        const tatImages = [
+            "images/1.jpg",
+            "images/2.jpg",
+            "images/3.jpg",
+            "images/4.jpg",
+            "images/5.jpg",
+            "images/6.jpg",
+            "images/7.jpg",
+            "images/8.jpg",
+            "images/9.jpg",
+            "images/10.jpg",
+            "images/11.jpg"
+        ];
+
+        let currentImageIndex = 0; // To track the current image
+        let timerInterval; // To store the interval for the timer
+        let changeImageInterval; // To store the interval for changing images
+
+        function startTAT() {
+            const totalTimeInput = document.getElementById("totalTime").value;
+            const tatTimer = document.getElementById("tatTimer");
+            const tatImage = document.getElementById("tatImage");
+
+            // Convert the total time (in minutes) to seconds
+            let totalTime = parseInt(totalTimeInput, 10) * 60;
+
+            if (isNaN(totalTime) || totalTime <= 0) {
+                alert("Please enter a valid positive number for time.");
+                return;
+            }
+
+            currentImageIndex = 0; // Start with the first image
+            tatImage.src = tatImages[currentImageIndex]; // Display the first image
+
+            // Calculate the interval for each image change
+            const timePerImage = Math.floor(totalTime / tatImages.length);
+
+            // Start the timer
+            startTimer(totalTime, tatTimer);
+
+            // Change the image at regular intervals
+            changeImageInterval = setInterval(() => {
+                currentImageIndex++;
+                if (currentImageIndex < tatImages.length) {
+                    tatImage.src = tatImages[currentImageIndex];
+                } else {
+                    clearInterval(changeImageInterval); // Stop changing images after the last one
+                }
+            }, timePerImage * 1000); // Convert to milliseconds
+        }
+
+        function startTimer(duration, display) {
+            let timer = duration, minutes, seconds;
+
+            timerInterval = setInterval(() => {
+                minutes = Math.floor(timer / 60);
+                seconds = timer % 60;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = `Time Left: ${minutes}:${seconds}`;
+
+                if (--timer < 0) {
+                    clearInterval(timerInterval); // Stop the timer when it reaches 0
+                    clearInterval(changeImageInterval); // Ensure image switching also stops
+                    display.textContent = "Time's up!";
+                    alert("TAT session is over!");
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
